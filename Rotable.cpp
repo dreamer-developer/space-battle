@@ -29,17 +29,22 @@ private:
     int directionsNumber;
 
 public:
-    Rotable(){}
-    Rotable(int av, int dn) : angularVelocity(av), directionsNumber(dn) {}
+    Rotable(){
+        angularVelocity = -1;
+        direction = -1;
+    }
+    Rotable(int av, int dn) : angularVelocity(av), directionsNumber(dn) {
+        direction = -1;
+    }
     ~Rotable(){}
 
     int& getDirection() override { 
-        if (!direction)
+        if (direction == -1)
             throw std::invalid_argument("У объекта нет направления");
         return direction; 
     }
     int& getAngularVelocity() override {
-        if (!angularVelocity)
+        if (angularVelocity == -1)
             throw std::invalid_argument("У объекта нет угловой скорости");
         return angularVelocity; 
     }
