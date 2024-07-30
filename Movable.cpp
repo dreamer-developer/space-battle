@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 
 struct Point{
     int x;
@@ -20,40 +19,55 @@ public:
     virtual void setPosition(const Point& newV) = 0;
 };
 
-// Класс, реализующий интерфейс Movable
+// Класс, реализующий интерфейс MovableAbstract
 class Movable : public MovableAbstract {
 private:
-    Point position;
-    Point velocity;
+    Point _position;
+    Point _velocity;
+    bool _isStill;//признак неподвижности объекта
 
-public:
+public://Реализуем несколько конструкторов вместо нескольких наследуемых классов, чтобы не дублировать код
+    //Конструктор по умолчанию не задает никаких начальных настроек
     Movable(){
-        velocity.x = -7;
-        velocity.y = 3;
-    };
+        _isStill = false;
+    }
+    //Конструктор задает только начальную скорость
+    Movable(Point& velocity){ 
+        _velocity = velocity;
+        _isStill = false;
+    }
+    //Конструктор принимает признак неподвижности объекта
+    Movable(bool isStill) : _isStill(isStill) {}
+    ~Movable(){}
 
     Point& getPosition() override {
-        return position;
+        if (!_position.x && !_position.y)
+            throw std::invalid_argument("У объекта нет положения в пространстве");
+        return _position;
         //std::cout << "Position: (" << position.x << ", " << position.y << ")" << std::endl;
     }
 
     Point& getVelocity() override {
-        return velocity;
-        //std::cout << "Velocity: (" << velocity.x << ", " << velocity.y << ")" << std::endl;
+        if (!_velocity.x && !_velocity.y)
+            throw std::invalid_argument("У объекта нет мгновенной скорости");
+        return _velocity;
+        std::cout << "Velocity: (" << _velocity.x << ", " << _velocity.y << ")" << std::endl;
     }
 
     void setPosition(const Point& newV) override {
-        position = newV;
+        if (_position.x && _position.y && _isStill)
+            throw std::invalid_argument("Объект нельзя передвинуть, он неподвижен");
+        _position = newV;
     }
 };
 
 class Move {
     public:
-    Move(Movable &m) : _m(m){}
+    Move(MovableAbstract &m) : _m(m){}
 
     void execute(){
         _m.setPosition(sumPoints(_m.getPosition(),_m.getVelocity()));
     }
     private:
-        Movable& _m;
+        MovableAbstract& _m;
 };
